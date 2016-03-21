@@ -36,7 +36,7 @@ public class AlbaClient {
    		    	sb.append("&");
             }
 
-			sb.append(String.format("%s=%s", entry.getKey(),entry.getValue()));	            
+			sb.append(String.format("%s=%s", entry.getKey(), entry.getValue()));
 		}
 		String urlParameters = sb.toString();
 		
@@ -61,16 +61,14 @@ public class AlbaClient {
 		con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded"); 
 		con.setRequestProperty("charset", "utf-8");
 		con.setRequestProperty("Content-Length", Integer.toString(postDataLength));
-		con.setUseCaches( false );
-		try( DataOutputStream wr = new DataOutputStream(con.getOutputStream())) {
-		   wr.write( postData );
+		con.setUseCaches(false);
+		try(DataOutputStream wr = new DataOutputStream(con.getOutputStream())) {
+		   wr.write(postData);
 		}
 		
 		java.io.InputStream ins = con.getInputStream();
         InputStreamReader isr = new InputStreamReader(ins);
         BufferedReader in = new BufferedReader(isr);
-
-
         StringBuilder builder = new StringBuilder();		
 		
 		String line;
@@ -123,7 +121,8 @@ public class AlbaClient {
 	 * @param cost стоисмость услуги в рублях, которую должен оплатить клиент
 	 * @return данные о транзакакции	
 	 * */	
-	public InitPaymentAnswer initPayment(String payType, float cost, String name, String email, String phone, String orderId) throws AlbaTemporaryError, AlbaFatalError {		
+	public InitPaymentAnswer initPayment(String payType, float cost, String name, String email, String phone, String orderId)
+			throws AlbaTemporaryError, AlbaFatalError {
 		Map<String, String> params = new HashMap<String, String>();		
 		
 		params.put("payment_type", payType);
