@@ -1,9 +1,11 @@
 Библиотека для работы c Alba
 =============
 
-Библиотека содержит следующие классы:
+Библиотека содержит следующие основные классы:
 
-AlbaClient - позволяет иницировать транзакию и получить статус транзакции.
+AlbaService - сервис получения доступных способов оплат, инициации транзакции, проверки статуса и т.д.
+
+InitPaymentRequest - параметры запроса для инициации транзакции.
 
 InitPaymentAnswer - результат инициации транзакции, содержит такие поля как идентификатор транзакции и сессионный ключ для получения статуса транзакции.
 
@@ -16,13 +18,21 @@ AlbaFatalError - срабатывает, если ошибка фатальна 
 
 Пример инициации транзакции:
 
-       AlbaClient alba = new AlbaClient("<KEY>");
-       InitPaymentAnswer answer = alba.initPayment("mc", 150, "Test Payment", "mail@example.com", "79111111111", null);
+       AlbaClient service = new AlbaClient("<KEY>");
+       InitPaymentRequest request = new InitPaymentRequest()
+                .builder()
+                .setPaymentType("mc")
+                .setCost(new BigDecimal(10.5))
+                .setName("Test")
+                .setEmail("main@example.com")
+                .setPhone("71111111111")
+                .build();
+       InitPaymentAnswer answer = service.initPayment(request);
 
 Получение статуса транзакции:
 
-       TransactionDetails details = alba.transactionDetails(answer.getSessionKey());
-       if (details.equals("payed") || details.equals("success")) {
+       TransactionDetails details = service.transactionDetails(answer.getSessionKey());
+       if (details.getStatus() == TransactionStatus.PAYED || details.getStatus() == TransactionStatus.SUCCESS) {
           // транзакция оплачена
        } else {
           // транзакция не оплачена
