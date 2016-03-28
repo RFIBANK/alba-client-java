@@ -30,12 +30,15 @@ public class RestRequester {
         this.pendingRetries = pendingRetries;
     }
 
-    private String buildUrlParams(Map<String, String> params) throws UnsupportedEncodingException {
+    private String buildUrlParams(Map<String, String> params) throws UnsupportedEncodingException, AlbaFatalError {
         StringBuilder sb = new StringBuilder();
 
         for (Entry<String, String> entry : params.entrySet()) {
             if (sb.length() > 0) {
                 sb.append("&");
+            }
+            if (entry.getValue() == null) {
+                throw new AlbaFatalError("The parameter " + entry.getKey() + " is required");
             }
 
             sb.append(String.format(
@@ -63,7 +66,7 @@ public class RestRequester {
         return builder.toString();
     }
 
-    public JSONObject getRequest(String url, Map<String, String> params) throws IOException {
+    public JSONObject getRequest(String url, Map<String, String> params) throws IOException, AlbaFatalError {
         String urlWithParams;
 
         if (params == null) {

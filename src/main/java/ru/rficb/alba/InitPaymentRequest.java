@@ -18,7 +18,8 @@ public class InitPaymentRequest {
     private String phone;
     private String orderId;
     private CommissionMode commissionMode;
-    private boolean backgound = true;
+    private boolean background = true;
+    private InitTestType test;
 
     public InitPaymentRequest() {
 
@@ -88,12 +89,12 @@ public class InitPaymentRequest {
         this.orderId = orderId;
     }
 
-    public boolean isBackgound() {
-        return backgound;
+    public boolean isBackground() {
+        return background;
     }
 
-    public void setBackgound(boolean backgound) {
-        this.backgound = backgound;
+    public void setBackground(boolean background) {
+        this.background = background;
     }
 
     public CommissionMode getCommissionMode() {
@@ -104,9 +105,17 @@ public class InitPaymentRequest {
         this.commissionMode = commissionMode;
     }
 
+    public InitTestType isTest() {
+        return test;
+    }
+
+    public void setTest(InitTestType test) {
+        this.test = test;
+    }
+
     public InitPaymentRequest(String paymentType, String key, String secret, BigDecimal cost,
                               String name, String email, String phone, String orderId,
-                              CommissionMode commissionMode) {
+                              CommissionMode commissionMode, InitTestType test) {
         this.paymentType = paymentType;
         this.key = key;
         this.secret = secret;
@@ -116,15 +125,16 @@ public class InitPaymentRequest {
         this.phone = phone;
         this.orderId = orderId;
         this.commissionMode = commissionMode;
+        this.test = test;
     }
 
-    public InitPaymentRequestBuilder builder() {
+    public static InitPaymentRequestBuilder builder() {
         return new InitPaymentRequestBuilder();
     }
 
     public Map<String, String> getParams() {
 
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
 
         params.put("payment_type", paymentType);
         params.put("version", "2.1");
@@ -137,12 +147,15 @@ public class InitPaymentRequest {
         }
         params.put("cost", cost.toString());
         params.put("name", name);
-        params.put("email", email);
+        if (email != null) {
+            params.put("email", email);
+        }
         params.put("phone_number", phone);
-        params.put("background", backgound?"1":"0");
+        params.put("background", background ?"1":"0");
         if (orderId != null) {
             params.put("order_id", orderId);
         }
+        params.put("test", test.toString());
 
         return params;
     }
@@ -157,9 +170,10 @@ public class InitPaymentRequest {
         private String phone;
         private String orderId;
         private CommissionMode commissionMode;
+        private InitTestType test;
 
         public InitPaymentRequestBuilder() {
-
+            test = InitTestType.NONE;
         }
 
         public InitPaymentRequestBuilder setPaymentType(String paymentType) {
@@ -197,7 +211,7 @@ public class InitPaymentRequest {
             return this;
         }
 
-        public InitPaymentRequestBuilder setsecret(String secret) {
+        public InitPaymentRequestBuilder setSecret(String secret) {
             this.secret = secret;
             return this;
         }
@@ -211,6 +225,15 @@ public class InitPaymentRequest {
             return this;
         }
 
+        public InitTestType isTest() {
+            return test;
+        }
+
+        public InitPaymentRequestBuilder setTest(InitTestType test) {
+            this.test = test;
+            return this;
+        }
+
         public InitPaymentRequest build() {
             return new InitPaymentRequest(
                     paymentType,
@@ -221,7 +244,8 @@ public class InitPaymentRequest {
                     email,
                     phone,
                     orderId,
-                    commissionMode
+                    commissionMode,
+                    test
             );
         }
     }
