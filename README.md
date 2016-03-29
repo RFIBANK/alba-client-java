@@ -27,11 +27,11 @@ AlbaFatalError - срабатывает, если ошибка фатальна 
                 .setEmail("main@example.com")
                 .setPhone("71111111111")
                 .build();
-       InitPaymentAnswer answer = service.initPayment(request);
+       InitPaymentResponse response = service.initPayment(request);
 
 Получение статуса транзакции:
 
-       TransactionDetails details = service.transactionDetails(answer.getSessionKey());
+       TransactionDetails details = service.transactionDetails(response.getSessionKey());
        if (details.getStatus() == TransactionStatus.PAYED || details.getStatus() == TransactionStatus.SUCCESS) {
           // транзакция оплачена
        } else {
