@@ -11,6 +11,14 @@ InitPaymentAnswer - результат инициации транзакции, 
 
 TransactionDetails - результат проверки статуса транзакции.
 
+RefundRequest - параметры запроса для проведения возврата.
+
+RefundResponse - результат проведения возврата.
+
+CardTokenRequest - параметры запроса на получение токена карточних данных.
+
+CardTokenResponse - результат создания токена.
+
 В процессе работы могут сработать два исключения: AlbaTemporaryError и AlbaFatalError.
 AlbaTemporaryError - срабатывает, если случиласть временная ошибка.
 AlbaFatalError - срабатывает, если ошибка фатальна и не имеет смысла пытаться повторять операцию.
@@ -39,13 +47,14 @@ AlbaFatalError - срабатывает, если ошибка фатальна 
        }
 
 Для проведения оплаты банковской картой с вводом карточных данных необходимо сначала создать токен содержащий данные,
-а затем использовать его для инициации платежа. Данные необходимые для создания токена содержатся в CardTokenRequest.
+а затем использовать его для инициации платежа. Данные, необходимые для создания токена, содержатся в CardTokenRequest.
 Если карта требует проведения 3-D Secure проверку, то InitPaymentResponse будет содержать поле card3ds с данными
 для POST запроса на сайт банка-эмитента.
 
 Пример создания токена:
+
        AlbaClient service = new AlbaClient("<KEY>");
-       CardTokenRequest request = new CardTokenRequest(serviceId, cardNumber, month, year, cvc, cardHolder);
+       CardTokenRequest request = new CardTokenRequest(<ID-Сервиса>, "<Номер карты>", <Месяц>, "<Год>", "<CVC>", "<Владелец карты>");
        CardTokenResponse response = service.createCardToken(request);
 
 Если токен не удалось создать, то будет либо сгенерировано исключение - в случае проблем авторизации, сетевых проблем и т.д.
@@ -55,6 +64,7 @@ AlbaFatalError - срабатывает, если ошибка фатальна 
 
 
 Инициация транзакции с использованием токена:
+
        InitPaymentRequest request = InitPaymentRequest.builder()
                     .setPaymentType("spg")
                     .setCost(new BigDecimal(10.5))
@@ -64,6 +74,7 @@ AlbaFatalError - срабатывает, если ошибка фатальна 
        InitPaymentResponse response = alba.initPayment(request);
 
 Проверка, требуется ли 3-D Secure:
+
        Card3ds card3ds = response.getCard3ds();
        if (card3ds != null) {
            // Требуется 3-D secure
@@ -71,29 +82,34 @@ AlbaFatalError - срабатывает, если ошибка фатальна 
 
 Если 3-D secure требуется, то необходимо сделать POST запрос на адрес card3ds.getAcsUrl()
 с параметрами:
-  PaReq - с значением card3ds.getPaReq()
-  MD - с значением card3ds.getMd()
-  TermUrl - URL обработчика, на вашем сайте. На него будет возвращён пользователь после прохождения 3DS авторизации на сайте банка-эмитента карты. Этот URL нужно сформировать так, чтобы в нём передавалась информация о транзакции: рекомендуется передавать service_id, tid и order_id (если транзакция создана с ним);
 
-Обработчик результата 3DS авторизации (TermUrl) должен вызвать метод API /alba/ack3ds/ для проверки прохождения 3DS авторизации пользователем.
-В GET параметрах получит ранее сформированную информацию о транзакции (service_id, tid, order_id);
-В POST параметрах получит информацию от банка эмитента - поля PaRes и MD;
+       PaReq - с значением card3ds.getPaReq()
+       MD - с значением card3ds.getMd()
+       TermUrl - URL обработчика, на вашем сайте. На него будет возвращён пользователь после прохождения 3DS авторизации на сайте банка-эмитента карты. Этот URL нужно сформировать так, чтобы в нём передавалась информация о транзакции: рекомендуется передавать service_id, tid и order_id (если транзакция создана с ним).
+
+Обработчик результата 3DS авторизации (TermUrl) в GET параметрах получит ранее сформированную информацию о транзакции (service_id, tid, order_id), в POST параметрах получит информацию от банка эмитента - поля PaRes и MD;
 
 Для проверки прохождения 3DS авторизации следует вызвать POST запросом API https://partner.rficb.ru/alba/ack3ds/ , передав туда:
-service_id;
-tid или order_id;
-emitent_response - данные, пришедшие от банка-эмитента в виде JSON-encoded словаря;
+
+        service_id;
+        tid или order_id;
+        emitent_response - данные, пришедшие от банка-эмитента в виде JSON-encoded словаря;
 
 Авторизация запроса: подпись версии 2.0+ или через api_key
 Результат метода API /alba/ack3ds/:
+
 1. При неуспехе, будет возвращен ответ в виде JSON:
-{"status": "error", "message": "ОПИСАНИЕ ОШИБКИ"}
+
+        {"status": "error", "message": "ОПИСАНИЕ ОШИБКИ"}
+
 2. При успешной проверке, будет возвращен ответ в виде JSON:
-{"status": "success"}
+
+        {"status": "success"}
 
 
 Так же есть возможность воспользоваться готовым termUrl, для этого достаточно указать:
-https://secure.rficb.ru/acquire?sid=<id-сервиса>&oid=<id-транзакции>&op=pay
+
+         https://secure.rficb.ru/acquire?sid=<id-сервиса>&oid=<id-транзакции>&op=pay
 
 Тогда пользователь будет направлен через форму банка, на URL страницы успешной покупки/ошибки сервиса.
 
