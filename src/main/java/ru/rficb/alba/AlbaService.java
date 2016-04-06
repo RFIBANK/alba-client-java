@@ -31,7 +31,7 @@ public class AlbaService {
     }
 
     public AlbaService() {
-		this.key = null;
+        this.key = null;
         this.logger = Logger.getLogger(AlbaService.class.getName());
         this.requester = new RestRequester(this.logger);
     }
@@ -119,36 +119,36 @@ public class AlbaService {
         return sb.toString();
     }
 
-	/**
-	 * Вызывает исключения в случае неуспешного ответа в jsonObject
-	 *
-	 * @param jsonObject
-	 * @throws AlbaTemporaryError, AlbaFatalError
-	 * */
-	private void throwForError(JSONObject jsonObject) throws AlbaTemporaryError, AlbaFatalError {
-		try {
-			if (!jsonObject.get("status").equals("success")) {
-				String code;
-				String msg;
+    /**
+     * Вызывает исключения в случае неуспешного ответа в jsonObject
+     *
+     * @param jsonObject
+     * @throws AlbaTemporaryError, AlbaFatalError
+     * */
+    private void throwForError(JSONObject jsonObject) throws AlbaTemporaryError, AlbaFatalError {
+        try {
+            if (!jsonObject.get("status").equals("success")) {
+                String code;
+                String msg;
 
-				if (jsonObject.has("code")) {
-					code = jsonObject.getString("code");
-				} else {
-					code = "unknown";
-				}
+                if (jsonObject.has("code")) {
+                    code = jsonObject.getString("code");
+                } else {
+                    code = "unknown";
+                }
 
-				if (jsonObject.has("msg")) {
-					msg = jsonObject.getString("msg");
-				} else {
-					msg = jsonObject.getString("message");
-				}
+                if (jsonObject.has("msg")) {
+                    msg = jsonObject.getString("msg");
+                } else {
+                    msg = jsonObject.getString("message");
+                }
 
-				throw new AlbaFatalError(msg, AlbaErrorCode.fromString(code));
-			}
-		} catch (JSONException e) {
-			throw new AlbaTemporaryError(e.toString());
-		}
-	}
+                throw new AlbaFatalError(msg, AlbaErrorCode.fromString(code));
+            }
+        } catch (JSONException e) {
+            throw new AlbaTemporaryError(e.toString());
+        }
+    }
 
     /**
      * Получение списка доступных способов оплаты для сервиса
@@ -227,36 +227,36 @@ public class AlbaService {
             }
         }
 
-		try {
-			JSONObject result = requester.postRequest(url, params);
-			throwForError(result);
-			return new InitPaymentResponse(result);
-		} catch (IOException e) {
-			throw new AlbaTemporaryError(e.getMessage());
-		}
-	}
+        try {
+            JSONObject result = requester.postRequest(url, params);
+            throwForError(result);
+            return new InitPaymentResponse(result);
+        } catch (IOException e) {
+            throw new AlbaTemporaryError(e.getMessage());
+        }
+    }
 
-	/**
-	 * Получение статуса транзакции
-	 *
-	 * @param sessionKey сессионный ключ
-	 * @return информация о транзакции
-	 * @throws AlbaTemporaryError, AlbaFatalError
-	 * */
-	public TransactionDetails transactionDetails(String sessionKey) throws AlbaTemporaryError, AlbaFatalError {
+    /**
+     * Получение статуса транзакции
+     *
+     * @param sessionKey сессионный ключ
+     * @return информация о транзакции
+     * @throws AlbaTemporaryError, AlbaFatalError
+     * */
+    public TransactionDetails transactionDetails(String sessionKey) throws AlbaTemporaryError, AlbaFatalError {
 
-		Map<String, String> params = new HashMap<>();
-		params.put("session_key", sessionKey);
-		params.put("version", "2.1");
+        Map<String, String> params = new HashMap<>();
+        params.put("session_key", sessionKey);
+        params.put("version", "2.1");
 
-		try {
-			JSONObject result = requester.postRequest(baseUrl + "alba/details/", params);
-			throwForError(result);
-			return new TransactionDetails(result);
-		} catch (IOException e) {
-			throw new AlbaTemporaryError(e.getMessage());
-		}
-	}
+        try {
+            JSONObject result = requester.postRequest(baseUrl + "alba/details/", params);
+            throwForError(result);
+            return new TransactionDetails(result);
+        } catch (IOException e) {
+            throw new AlbaTemporaryError(e.getMessage());
+        }
+    }
 
     /**
      * Запрос на проведение возврата
