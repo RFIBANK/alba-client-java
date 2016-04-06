@@ -13,7 +13,7 @@ import org.json.JSONObject;
 
 public class AlbaService {
     protected String baseUrl = "https://partner.rficb.ru/";
-    protected String cardTokenUrl = "https://test.rficb.ru/cardtoken/";
+    protected String cardTokenUrl = "https://secure.rficb.ru/cardtoken/";
     protected String cardTokenTestUrl = "https://test.rficb.ru/cardtoken/";
 
     private Integer serviceId;
@@ -304,7 +304,7 @@ public class AlbaService {
     /**
      * Создание токена для оплаты
      */
-    public CardTokenResponse createCardToken(CardTokenRequest request) throws AlbaTemporaryError, AlbaFatalError {
+    public CardTokenResponse createCardToken(CardTokenRequest request, boolean test) throws AlbaTemporaryError, AlbaFatalError {
         Map<String, String> params = new HashMap<>();
 
         params.put("service_id", String.valueOf(request.getServiceId()));
@@ -322,7 +322,7 @@ public class AlbaService {
 
         JSONObject result;
         try {
-            result = requester.postRequest(cardTokenTestUrl + "create", params);
+            result = requester.postRequest(test?cardTokenTestUrl:cardTokenUrl + "create", params);
             return new CardTokenResponse(result);
 
         } catch (IOException e) {

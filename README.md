@@ -55,7 +55,7 @@ AlbaFatalError - срабатывает, если ошибка фатальна 
 
        AlbaClient service = new AlbaClient("<KEY>");
        CardTokenRequest request = new CardTokenRequest(<ID-Сервиса>, "<Номер карты>", <Месяц>, "<Год>", "<CVC>", "<Владелец карты>");
-       CardTokenResponse response = service.createCardToken(request);
+       CardTokenResponse response = service.createCardToken(request, True); // True - токен для тестовой оплаты
 
 Если токен не удалось создать, то будет либо сгенерировано исключение - в случае проблем авторизации, сетевых проблем и т.д.
 Либо метод response.hasErrors() вернет true, в этом случае данные не прошли валидацию,
