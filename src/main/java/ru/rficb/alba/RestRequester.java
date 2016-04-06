@@ -16,6 +16,7 @@ public class RestRequester {
     private int pendingRetries;
     private static final int SLEEP_WHILE_PENDING_MS = 5000;
     private static final int defaultPendingRetries = 10;
+    private static final String disableLogParameter = "card";
 
     public RestRequester(Logger logger) {
         this.pendingRetries = defaultPendingRetries;
@@ -101,7 +102,9 @@ public class RestRequester {
         for(retry = 1; retry < pendingRetries + 1; retry++) {
             String urlParameters = buildUrlParams(params);
             logger.log(Level.INFO, "POST request url: " + url);
-            logger.log(Level.INFO, "POST request parameters: " + urlParameters);
+            if (!params.containsKey(disableLogParameter)) {
+                logger.log(Level.INFO, "POST request parameters: " + urlParameters);
+            }
 
             byte[] postData = urlParameters.getBytes(Charset.forName("UTF-8"));
             int postDataLength = postData.length;

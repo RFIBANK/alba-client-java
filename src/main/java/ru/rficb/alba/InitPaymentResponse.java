@@ -12,6 +12,7 @@ public class InitPaymentResponse {
 	private String terminalCode;
 	private String sessionKey;
 	private String help;
+	private Card3ds card3ds;
 
 	public InitPaymentResponse(JSONObject jsonObject) throws AlbaTemporaryError {
 		try {
@@ -40,6 +41,18 @@ public class InitPaymentResponse {
 		} catch (JSONException e) {
 			this.sessionKey = null;
 		}
+
+        try {
+            JSONObject data = jsonObject.getJSONObject("3ds");
+            card3ds = new Card3ds(
+                    data.getString("ACSUrl"),
+                    data.getString("MD"),
+                    data.getString("PaReq")
+            );
+        } catch (JSONException e) {
+            this.card3ds = null;
+        }
+
 	}
 
 	public int getTransactionId() {
@@ -57,4 +70,6 @@ public class InitPaymentResponse {
 	public String getSessionKey() {
 		return sessionKey;
 	}
+
+    public Card3ds getCard3ds() {return card3ds; }
 }

@@ -13,6 +13,9 @@ import org.json.JSONObject;
 
 public class AlbaService {
     protected String baseUrl = "https://partner.rficb.ru/";
+    protected String cardTokenUrl = "https://test.rficb.ru/cardtoken/";
+    protected String cardTokenTestUrl = "https://test.rficb.ru/cardtoken/";
+
     private Integer serviceId;
     private String key;
     private String secret;
@@ -98,6 +101,24 @@ public class AlbaService {
         }
     }
 
+    private static <T> String implode(String glue, List<T> list) {
+
+        if (list == null || list.isEmpty()) {
+            return "";
+        }
+
+        Iterator<T> iterator = list.iterator();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(iterator.next());
+
+        while (iterator.hasNext()) {
+            sb.append(glue).append(iterator.next());
+        }
+
+        return sb.toString();
+    }
+
 	/**
 	 * Вызывает исключения в случае неуспешного ответа в jsonObject
 	 *
@@ -121,8 +142,8 @@ public class AlbaService {
 				} else {
 					msg = jsonObject.getString("message");
 				}
-				String error = String.format("[%s] %s", code, msg);
-				throw new AlbaFatalError(error);
+
+				throw new AlbaFatalError(msg, AlbaErrorCode.fromString(code));
 			}
 		} catch (JSONException e) {
 			throw new AlbaTemporaryError(e.toString());
@@ -277,6 +298,38 @@ public class AlbaService {
         } catch (IOException e) {
             throw new AlbaTemporaryError("Can't refund: " + e.getMessage());
         }
+
+    }
+
+    /**
+     * Создание токена для оплаты
+     */
+    public CardTokenResponse createCardToken(CardTokenRequest request) throws AlbaTemporaryError, AlbaFatalError {
+        Map<String, String> params = new HashMap<>();
+
+        params.put("service_id", String.valueOf(request.getServiceId()));
+        params.put("card", request.getCard());
+        String month = String.valueOf(request.getExpMonth());
+        if (month.length() == 1) {
+            month = "0" + month;
+        }
+        params.put("exp_month", month);
+        params.put("exp_year", String.valueOf(request.getExpYear()));
+        params.put("cvc", request.getCvc());
+        if (request.getCardHolder() != null) {
+            params.put("card_holder", request.getCardHolder());
+        }
+
+        JSONObject result;
+        try {
+            result = requester.postRequest(cardTokenTestUrl + "create", params);
+            return new CardTokenResponse(result);
+
+        } catch (IOException e) {
+            throw new AlbaTemporaryError("Can't create card token: " + e.getMessage());
+        }
+
+
 
     }
 
