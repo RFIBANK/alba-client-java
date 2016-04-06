@@ -1,7 +1,6 @@
 package ru.rficb.alba;
 
 import java.math.BigDecimal;
-import java.sql.Ref;
 
 /**
  * Параметры запроса на возврат
