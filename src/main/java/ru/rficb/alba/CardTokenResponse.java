@@ -33,7 +33,7 @@ public class CardTokenResponse {
     }
 
     public List<String> getCardHolderErrors() {
-        return errors.get("holder");
+        return errors.get("card_holder");
     }
 
     public List<String> getExpMonthErrors() {
