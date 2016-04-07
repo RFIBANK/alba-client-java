@@ -13,6 +13,9 @@ import org.json.JSONObject;
 
 public class AlbaService {
     protected String baseUrl = "https://partner.rficb.ru/";
+    protected String cardTokenUrl = "https://secure.rficb.ru/cardtoken/";
+    protected String cardTokenTestUrl = "https://test.rficb.ru/cardtoken/";
+
     private Integer serviceId;
     private String key;
     private String secret;
@@ -28,7 +31,7 @@ public class AlbaService {
     }
 
     public AlbaService() {
-		this.key = null;
+        this.key = null;
         this.logger = Logger.getLogger(AlbaService.class.getName());
         this.requester = new RestRequester(this.logger);
     }
@@ -98,36 +101,54 @@ public class AlbaService {
         }
     }
 
-	/**
-	 * Вызывает исключения в случае неуспешного ответа в jsonObject
-	 *
-	 * @param jsonObject
-	 * @throws AlbaTemporaryError, AlbaFatalError
-	 * */
-	private void throwForError(JSONObject jsonObject) throws AlbaTemporaryError, AlbaFatalError {
-		try {
-			if (!jsonObject.get("status").equals("success")) {
-				String code;
-				String msg;
+    private static <T> String implode(String glue, List<T> list) {
 
-				if (jsonObject.has("code")) {
-					code = jsonObject.getString("code");
-				} else {
-					code = "unknown";
-				}
+        if (list == null || list.isEmpty()) {
+            return "";
+        }
 
-				if (jsonObject.has("msg")) {
-					msg = jsonObject.getString("msg");
-				} else {
-					msg = jsonObject.getString("message");
-				}
-				String error = String.format("[%s] %s", code, msg);
-				throw new AlbaFatalError(error);
-			}
-		} catch (JSONException e) {
-			throw new AlbaTemporaryError(e.toString());
-		}
-	}
+        Iterator<T> iterator = list.iterator();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(iterator.next());
+
+        while (iterator.hasNext()) {
+            sb.append(glue).append(iterator.next());
+        }
+
+        return sb.toString();
+    }
+
+    /**
+     * Вызывает исключения в случае неуспешного ответа в jsonObject
+     *
+     * @param jsonObject
+     * @throws AlbaTemporaryError, AlbaFatalError
+     * */
+    private void throwForError(JSONObject jsonObject) throws AlbaTemporaryError, AlbaFatalError {
+        try {
+            if (!jsonObject.get("status").equals("success")) {
+                String code;
+                String msg;
+
+                if (jsonObject.has("code")) {
+                    code = jsonObject.getString("code");
+                } else {
+                    code = "unknown";
+                }
+
+                if (jsonObject.has("msg")) {
+                    msg = jsonObject.getString("msg");
+                } else {
+                    msg = jsonObject.getString("message");
+                }
+
+                throw new AlbaFatalError(msg, AlbaErrorCode.fromString(code));
+            }
+        } catch (JSONException e) {
+            throw new AlbaTemporaryError(e.toString());
+        }
+    }
 
     /**
      * Получение списка доступных способов оплаты для сервиса
@@ -206,36 +227,36 @@ public class AlbaService {
             }
         }
 
-		try {
-			JSONObject result = requester.postRequest(url, params);
-			throwForError(result);
-			return new InitPaymentResponse(result);
-		} catch (IOException e) {
-			throw new AlbaTemporaryError(e.getMessage());
-		}
-	}
+        try {
+            JSONObject result = requester.postRequest(url, params);
+            throwForError(result);
+            return new InitPaymentResponse(result);
+        } catch (IOException e) {
+            throw new AlbaTemporaryError(e.getMessage());
+        }
+    }
 
-	/**
-	 * Получение статуса транзакции
-	 *
-	 * @param sessionKey сессионный ключ
-	 * @return информация о транзакции
-	 * @throws AlbaTemporaryError, AlbaFatalError
-	 * */
-	public TransactionDetails transactionDetails(String sessionKey) throws AlbaTemporaryError, AlbaFatalError {
+    /**
+     * Получение статуса транзакции
+     *
+     * @param sessionKey сессионный ключ
+     * @return информация о транзакции
+     * @throws AlbaTemporaryError, AlbaFatalError
+     * */
+    public TransactionDetails transactionDetails(String sessionKey) throws AlbaTemporaryError, AlbaFatalError {
 
-		Map<String, String> params = new HashMap<>();
-		params.put("session_key", sessionKey);
-		params.put("version", "2.1");
+        Map<String, String> params = new HashMap<>();
+        params.put("session_key", sessionKey);
+        params.put("version", "2.1");
 
-		try {
-			JSONObject result = requester.postRequest(baseUrl + "alba/details/", params);
-			throwForError(result);
-			return new TransactionDetails(result);
-		} catch (IOException e) {
-			throw new AlbaTemporaryError(e.getMessage());
-		}
-	}
+        try {
+            JSONObject result = requester.postRequest(baseUrl + "alba/details/", params);
+            throwForError(result);
+            return new TransactionDetails(result);
+        } catch (IOException e) {
+            throw new AlbaTemporaryError(e.getMessage());
+        }
+    }
 
     /**
      * Запрос на проведение возврата
@@ -277,6 +298,38 @@ public class AlbaService {
         } catch (IOException e) {
             throw new AlbaTemporaryError("Can't refund: " + e.getMessage());
         }
+
+    }
+
+    /**
+     * Создание токена для оплаты
+     */
+    public CardTokenResponse createCardToken(CardTokenRequest request, boolean test) throws AlbaTemporaryError, AlbaFatalError {
+        Map<String, String> params = new HashMap<>();
+
+        params.put("service_id", String.valueOf(request.getServiceId()));
+        params.put("card", request.getCard());
+        String month = String.valueOf(request.getExpMonth());
+        if (month.length() == 1) {
+            month = "0" + month;
+        }
+        params.put("exp_month", month);
+        params.put("exp_year", String.valueOf(request.getExpYear()));
+        params.put("cvc", request.getCvc());
+        if (request.getCardHolder() != null) {
+            params.put("card_holder", request.getCardHolder());
+        }
+
+        JSONObject result;
+        try {
+            result = requester.postRequest((test?cardTokenTestUrl:cardTokenUrl) + "create", params);
+            return new CardTokenResponse(result);
+
+        } catch (IOException e) {
+            throw new AlbaTemporaryError("Can't create card token: " + e.getMessage());
+        }
+
+
 
     }
 

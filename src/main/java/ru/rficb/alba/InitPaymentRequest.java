@@ -20,6 +20,7 @@ public class InitPaymentRequest {
     private CommissionMode commissionMode;
     private boolean background = true;
     private InitTestType test;
+    private String cardToken;
 
     public InitPaymentRequest() {
 
@@ -113,9 +114,17 @@ public class InitPaymentRequest {
         this.test = test;
     }
 
+    public String getCardToken() {
+        return cardToken;
+    }
+
+    public void setCardToken(String cardToken) {
+        this.cardToken = cardToken;
+    }
+
     public InitPaymentRequest(String paymentType, String key, String secret, BigDecimal cost,
                               String name, String email, String phone, String orderId,
-                              CommissionMode commissionMode, InitTestType test) {
+                              CommissionMode commissionMode, InitTestType test, String cardToken) {
         this.paymentType = paymentType;
         this.key = key;
         this.secret = secret;
@@ -126,6 +135,7 @@ public class InitPaymentRequest {
         this.orderId = orderId;
         this.commissionMode = commissionMode;
         this.test = test;
+        this.cardToken = cardToken;
     }
 
     public static InitPaymentRequestBuilder builder() {
@@ -150,11 +160,18 @@ public class InitPaymentRequest {
         if (email != null) {
             params.put("email", email);
         }
-        params.put("phone_number", phone);
+        if (phone != null) {
+            params.put("phone_number", phone);
+        }
         params.put("background", background ?"1":"0");
         if (orderId != null) {
             params.put("order_id", orderId);
         }
+
+        if (cardToken != null) {
+            params.put("card_token", cardToken);
+        }
+
         params.put("test", test.toString());
 
         return params;
@@ -171,6 +188,7 @@ public class InitPaymentRequest {
         private String orderId;
         private CommissionMode commissionMode;
         private InitTestType test;
+        private String cardToken;
 
         public InitPaymentRequestBuilder() {
             test = InitTestType.NONE;
@@ -234,6 +252,15 @@ public class InitPaymentRequest {
             return this;
         }
 
+        public String getCardToken() {
+            return cardToken;
+        }
+
+        public InitPaymentRequestBuilder setCardToken(String cardToken) {
+            this.cardToken = cardToken;
+            return this;
+        }
+
         public InitPaymentRequest build() {
             return new InitPaymentRequest(
                     paymentType,
@@ -245,7 +272,8 @@ public class InitPaymentRequest {
                     phone,
                     orderId,
                     commissionMode,
-                    test
+                    test,
+                    cardToken
             );
         }
     }
