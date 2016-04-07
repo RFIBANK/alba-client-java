@@ -322,7 +322,7 @@ public class AlbaService {
 
         JSONObject result;
         try {
-            result = requester.postRequest(test?cardTokenTestUrl:cardTokenUrl + "create", params);
+            result = requester.postRequest((test?cardTokenTestUrl:cardTokenUrl) + "create", params);
             return new CardTokenResponse(result);
 
         } catch (IOException e) {
