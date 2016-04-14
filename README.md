@@ -69,7 +69,7 @@ AlbaFatalError - срабатывает, если ошибка фатальна 
                     .setPaymentType("spg_test")
                     .setCost(new BigDecimal(10.5))
                     .setName("Test")
-                    .setCardToken(response.token)
+                    .setCardToken(response.getToken())
                     .build();
        InitPaymentResponse response = alba.initPayment(request);
 
