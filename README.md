@@ -93,7 +93,7 @@ AlbaFatalError - срабатывает, если ошибка фатальна 
 
         service_id;
         tid или order_id;
-        emitent_response - данные, пришедшие от банка-эмитента в виде JSON-encoded словаря;
+        emitent_response - данные, пришедшие от банка-эмитента в виде JSON-encoded словаря (Содержатся в card3ds)
 
 Авторизация запроса: подпись версии 2.0+ или через api_key
 Результат метода API /alba/ack3ds/:
