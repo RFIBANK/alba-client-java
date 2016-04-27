@@ -113,8 +113,37 @@ AlbaFatalError - срабатывает, если ошибка фатальна 
 
 Или в случае тестовой оплаты:
 
-         https://test.rficb.ru/acquire?sid=<ID-Сервиса>&oid=<ID-Транзакции>&op=pay       
+         https://test.rficb.ru/acquire?sid=<ID-Сервиса>&oid=<ID-Транзакции>&op=pay
 
 Тогда пользователь будет направлен через форму банка, на URL страницы успешной покупки/ошибки сервиса.
 
+Рекуррентный платеж
+-------------
+
+Рекуррентные платежи позволяют проводить периодические списания без дополнительного ввода карточных данных.
+
+Первый вызов должен содержать токен, ссылку на подробное описание правил предоставления рекуррентного платежа и
+текстовое описание за что производится регистрация РП.
+
+Пример:
+
+         InitPaymentRequest request = InitPaymentRequest
+                .builder()
+                ...
+                .setRecurrentParams(RecurrentParams.first("<URL>", "<COMMENT>"))
+                .setCardToken(response.getToken())
+                .setOrderId("1000")
+                ...
+
+Последующие вызовы должны содержать orderId, который был использован при первом вызове.
+
+Пример:
+
+         InitPaymentRequest request = InitPaymentRequest
+                .builder()
+                ...
+                .setRecurrentParams(RecurrentParams.next("1000"))
+                ...
+
 Полноценная демонстрация работы библиотеки: https://github.com/RFIBANK/alba-client-android-example
+

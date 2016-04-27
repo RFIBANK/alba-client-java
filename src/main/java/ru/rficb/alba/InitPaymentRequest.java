@@ -21,6 +21,7 @@ public class InitPaymentRequest {
     private boolean background = true;
     private InitTestType test;
     private String cardToken;
+    private RecurrentParams recurrentParams;
 
     public InitPaymentRequest() {
 
@@ -122,9 +123,18 @@ public class InitPaymentRequest {
         this.cardToken = cardToken;
     }
 
+    public RecurrentParams getRecurrentParams() {
+        return recurrentParams;
+    }
+
+    public void setRecurrentParams(RecurrentParams recurrentParams) {
+        this.recurrentParams = recurrentParams;
+    }
+
     public InitPaymentRequest(String paymentType, String key, String secret, BigDecimal cost,
                               String name, String email, String phone, String orderId,
-                              CommissionMode commissionMode, InitTestType test, String cardToken) {
+                              CommissionMode commissionMode, InitTestType test, String cardToken,
+                              RecurrentParams recurrentParams) {
         this.paymentType = paymentType;
         this.key = key;
         this.secret = secret;
@@ -136,13 +146,14 @@ public class InitPaymentRequest {
         this.commissionMode = commissionMode;
         this.test = test;
         this.cardToken = cardToken;
+        this.recurrentParams = recurrentParams;
     }
 
     public static InitPaymentRequestBuilder builder() {
         return new InitPaymentRequestBuilder();
     }
 
-    public Map<String, String> getParams() {
+    public Map<String, String> getParams() throws AlbaFatalError {
 
         Map<String, String> params = new HashMap<>();
 
@@ -172,6 +183,22 @@ public class InitPaymentRequest {
             params.put("card_token", cardToken);
         }
 
+        if (recurrentParams != null) {
+            if (recurrentParams.type == RecurrentType.FIRST) {
+                params.put("recurrent_type", "first");
+                params.put("recurrent_comment", recurrentParams.getComment());
+                params.put("recurrent_url", recurrentParams.getUrl());
+                params.put("recurrent_period", recurrentParams.getPeriod().toString());
+            } else {
+                if (!background) {
+                    throw new AlbaFatalError("When recurrent_type is \"next\" then background should be \"1\"");
+                } else {
+                    params.put("recurrent_type", "next");
+                    params.put("recurrent_order_id", recurrentParams.getOrderId());
+                }
+            }
+        }
+
         params.put("test", test.toString());
 
         return params;
@@ -189,6 +216,7 @@ public class InitPaymentRequest {
         private CommissionMode commissionMode;
         private InitTestType test;
         private String cardToken;
+        private RecurrentParams recurrentParams;
 
         public InitPaymentRequestBuilder() {
             test = InitTestType.NONE;
@@ -256,6 +284,15 @@ public class InitPaymentRequest {
             return cardToken;
         }
 
+        public RecurrentParams getRecurrentParams() {
+            return recurrentParams;
+        }
+
+        public InitPaymentRequestBuilder setRecurrentParams(RecurrentParams recurrentParams) {
+            this.recurrentParams = recurrentParams;
+            return this;
+        }
+
         public InitPaymentRequestBuilder setCardToken(String cardToken) {
             this.cardToken = cardToken;
             return this;
@@ -273,7 +310,8 @@ public class InitPaymentRequest {
                     orderId,
                     commissionMode,
                     test,
-                    cardToken
+                    cardToken,
+                    recurrentParams
             );
         }
     }
