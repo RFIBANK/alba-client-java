@@ -26,7 +26,7 @@ AlbaFatalError - срабатывает, если ошибка фатальна 
 
 Пример инициации транзакции:
 
-       AlbaClient service = new AlbaClient("<KEY>");
+       AlbaService service = new AlbaService("<KEY>");
        InitPaymentRequest request = new InitPaymentRequest()
                 .builder()
                 .setPaymentType("mc")
@@ -53,7 +53,7 @@ AlbaFatalError - срабатывает, если ошибка фатальна 
 
 Пример создания токена:
 
-       AlbaClient service = new AlbaClient("<KEY>");
+       AlbaService service = new AlbaService("<KEY>");
        CardTokenRequest request = new CardTokenRequest(<ID-Сервиса>, "<Номер карты>", <Месяц>, "<Год>", "<CVC>", "<Владелец карты>");
        CardTokenResponse response = service.createCardToken(request, true); // true - токен для тестовой оплаты
 
