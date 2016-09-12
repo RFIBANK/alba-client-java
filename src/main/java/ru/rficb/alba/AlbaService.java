@@ -12,9 +12,7 @@ import org.json.JSONObject;
 
 
 public class AlbaService {
-    protected String baseUrl = "https://partner.rficb.ru/";
-    protected String cardTokenUrl = "https://secure.rficb.ru/cardtoken/";
-    protected String cardTokenTestUrl = "https://test.rficb.ru/cardtoken/";
+    protected ConnectionProfile connectionProfile;
 
     private Integer serviceId;
     private String key;
@@ -34,6 +32,7 @@ public class AlbaService {
         this.key = null;
         this.logger = Logger.getLogger(AlbaService.class.getName());
         this.requester = new RestRequester(this.logger);
+        this.connectionProfile = ConnectionProfile.first();
     }
 
     public AlbaService(int serviceId, String secret) {
@@ -47,12 +46,8 @@ public class AlbaService {
         setKey(key);
     }
 
-    public String getBaseUrl() {
-        return baseUrl;
-    }
-
-    public void setBaseUrl(String baseUrl) {
-        this.baseUrl = baseUrl;
+    public void setConnectionProfile(ConnectionProfile connectionProfile) {
+        this.connectionProfile = connectionProfile;
     }
 
     public String getKey() {
@@ -159,7 +154,7 @@ public class AlbaService {
             throw new AlbaFatalError("The parameter secret is required");
         }
 
-        String url = baseUrl + "alba/pay_types/";
+        String url = connectionProfile.getBaseUrl() + "alba/pay_types/";
         HashMap<String, String> params = new HashMap<>();
         params.put("service_id", serviceId.toString());
         params.put("version", "2.0");
@@ -195,7 +190,7 @@ public class AlbaService {
     public InitPaymentResponse initPayment(InitPaymentRequest request)
             throws AlbaTemporaryError, AlbaFatalError {
         Map<String, String> params = request.getParams();
-        String url = baseUrl + "alba/input";
+        String url = connectionProfile.getBaseUrl() + "alba/input";
 
         if (request.getKey() == null) {
             if (this.key != null) {
@@ -250,7 +245,7 @@ public class AlbaService {
         params.put("version", "2.1");
 
         try {
-            JSONObject result = requester.postRequest(baseUrl + "alba/details/", params);
+            JSONObject result = requester.postRequest(connectionProfile.getBaseUrl() + "alba/details/", params);
             throwForError(result);
             return new TransactionDetails(result);
         } catch (IOException e) {
@@ -266,7 +261,7 @@ public class AlbaService {
         if (secret == null) {
             throw new AlbaFatalError("The parameter secret is required");
         }
-        String url = baseUrl + "alba/refund/";
+        String url = connectionProfile.getBaseUrl() + "alba/refund/";
         Map<String, String> params = new HashMap<>();
         params.put("tid", String.valueOf(request.getTransactionId()));
         params.put("version", "2.0");
@@ -322,15 +317,13 @@ public class AlbaService {
 
         JSONObject result;
         try {
-            result = requester.postRequest((test?cardTokenTestUrl:cardTokenUrl) + "create", params);
+            String url = test?connectionProfile.getCardTokenTestUrl():connectionProfile.getCardTokenUrl();
+            result = requester.postRequest(url + "create", params);
             return new CardTokenResponse(result);
 
         } catch (IOException e) {
             throw new AlbaTemporaryError("Can't create card token: " + e.getMessage());
         }
-
-
-
     }
 
 
