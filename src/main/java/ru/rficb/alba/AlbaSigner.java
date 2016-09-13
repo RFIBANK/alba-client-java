@@ -13,7 +13,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import javax.xml.bind.DatatypeConverter;
 
 /**
  * Подпись версии 2.0+
@@ -21,7 +20,7 @@ import javax.xml.bind.DatatypeConverter;
 public class AlbaSigner {
 
     public static String sign(String method, String url, Map<String, String> params, String secretKey)
-            throws URISyntaxException, UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
+            throws URISyntaxException, UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException, AlbaFatalError {
 
         URI uri = new URI(url);
 
@@ -52,6 +51,6 @@ public class AlbaSigner {
         SecretKeySpec keySpec = new javax.crypto.spec.SecretKeySpec(charSet.encode(secretKey).array(), "HmacSHA256");
         hmacInstance.init(keySpec);
 
-        return DatatypeConverter.printBase64Binary(hmacInstance.doFinal(data.getBytes("UTF-8")));
+        return Base64Encoder.getInstance().encode(hmacInstance.doFinal(data.getBytes("UTF-8")));
     }
 }
