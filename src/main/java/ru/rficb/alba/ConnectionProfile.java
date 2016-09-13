@@ -4,9 +4,9 @@ package ru.rficb.alba;
  * Профиль подключения
  */
 public class ConnectionProfile {
-    protected String baseUrl = "https://partner.rficb.ru/";
-    protected String cardTokenUrl = "https://secure.rficb.ru/cardtoken/";
-    protected String cardTokenTestUrl = "https://test.rficb.ru/cardtoken/";
+    protected String baseUrl;
+    protected String cardTokenUrl;
+    protected String cardTokenTestUrl;
 
     public ConnectionProfile(String baseUrl, String cardTokenUrl, String cardTokenTestUrl) {
         this.baseUrl = baseUrl;
@@ -26,7 +26,7 @@ public class ConnectionProfile {
         return new ConnectionProfile(
                 "https://partner.rficb.ru/",
                 "https://secure.rfibank.ru/cardtoken/",
-                "https://test.rfibank.ru/cardtoken/"
+                "https://test.rficb.ru/cardtoken/"
         );
     }
 

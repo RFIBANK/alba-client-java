@@ -32,7 +32,7 @@ public class AlbaService {
         this.key = null;
         this.logger = Logger.getLogger(AlbaService.class.getName());
         this.requester = new RestRequester(this.logger);
-        this.connectionProfile = ConnectionProfile.first();
+        this.connectionProfile = ConnectionProfile.second();
     }
 
     public AlbaService(int serviceId, String secret) {

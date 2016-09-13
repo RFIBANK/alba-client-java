@@ -3,6 +3,8 @@ package ru.rficb.alba;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.Charset;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -87,6 +89,13 @@ public class RestRequester {
         if (conn instanceof HttpsURLConnection) {
             ((HttpsURLConnection) conn).setInstanceFollowRedirects(false);
             ((HttpsURLConnection) conn).setRequestMethod("GET");
+            try {
+                ((HttpsURLConnection) conn).setSSLSocketFactory(new TLSSocketFactory());
+            } catch (KeyManagementException e) {
+                throw new AlbaFatalError("Can't create socket factory (Key error)");
+            } catch (NoSuchAlgorithmException e) {
+                throw new AlbaFatalError("Can't create socket factory (No such algorithm)");
+            }
         } else {
             ((HttpURLConnection) conn).setInstanceFollowRedirects(false);
             ((HttpURLConnection) conn).setRequestMethod("GET");
@@ -117,6 +126,13 @@ public class RestRequester {
             if (conn instanceof HttpsURLConnection) {
                 ((HttpsURLConnection) conn).setInstanceFollowRedirects(false);
                 ((HttpsURLConnection) conn).setRequestMethod("POST");
+                try {
+                    ((HttpsURLConnection) conn).setSSLSocketFactory(new TLSSocketFactory());
+                } catch (KeyManagementException e) {
+                    throw new AlbaFatalError("Can't create socket factory (Key error)");
+                } catch (NoSuchAlgorithmException e) {
+                    throw new AlbaFatalError("Can't create socket factory (No such algorithm)");
+                }
             } else {
                 ((HttpURLConnection) conn).setInstanceFollowRedirects(false);
                 ((HttpURLConnection) conn).setRequestMethod("POST");
