@@ -17,6 +17,7 @@ public class InitPaymentRequest {
     private String email;
     private String phone;
     private String orderId;
+    private String comment;
     private CommissionMode commissionMode;
     private boolean background = true;
     private InitTestType test;
@@ -131,8 +132,16 @@ public class InitPaymentRequest {
         this.recurrentParams = recurrentParams;
     }
 
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
     public InitPaymentRequest(String paymentType, String key, String secret, BigDecimal cost,
-                              String name, String email, String phone, String orderId,
+                              String name, String email, String phone, String orderId, String comment,
                               CommissionMode commissionMode, InitTestType test, String cardToken,
                               RecurrentParams recurrentParams) {
         this.paymentType = paymentType;
@@ -143,6 +152,7 @@ public class InitPaymentRequest {
         this.email = email;
         this.phone = phone;
         this.orderId = orderId;
+        this.comment = comment;
         this.commissionMode = commissionMode;
         this.test = test;
         this.cardToken = cardToken;
@@ -179,6 +189,10 @@ public class InitPaymentRequest {
             params.put("order_id", orderId);
         }
 
+        if (comment != null) {
+            params.put("comment", comment);
+        }
+
         if (cardToken != null) {
             params.put("card_token", cardToken);
         }
@@ -213,6 +227,7 @@ public class InitPaymentRequest {
         private String email;
         private String phone;
         private String orderId;
+        private String comment;
         private CommissionMode commissionMode;
         private InitTestType test;
         private String cardToken;
@@ -254,6 +269,11 @@ public class InitPaymentRequest {
 
         public InitPaymentRequestBuilder setOrderId(String orderId) {
             this.orderId = orderId;
+            return this;
+        }
+
+        public InitPaymentRequestBuilder setComment(String comment) {
+            this.comment = comment;
             return this;
         }
 
@@ -308,6 +328,7 @@ public class InitPaymentRequest {
                     email,
                     phone,
                     orderId,
+                    comment,
                     commissionMode,
                     test,
                     cardToken,
