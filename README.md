@@ -145,5 +145,40 @@ AlbaFatalError - срабатывает, если ошибка фатальна 
                 .setRecurrentParams(RecurrentParams.next("1000"))
                 ...
 
+Если нужно добавить данные чека для фискализации, то необходимо создать объект InvoiceData и передать его в параметре paymentRequest:
+
+         InvoiceData data = new InvoiceData();
+         data.setVatTotal(<стоимость>);
+
+         InvoiceItem item1 = InvoiceItem.builder()
+                 .setCode("<Код товара>")
+                 .setName("<Наименование товара>")
+                 .setUnit("<Единица измерения>")
+                 .setVatMode("<Тип НДС>")
+                 .setPrice(<Цена за единицу>)
+                 .setQuantity(<Количество единиц>)
+                 .setSum(<Цена>)
+                 .setVatAmount(<Размер НДС>)
+                 .build();
+
+         InvoiceItem item2 = InvoiceItem.builder()
+                 .setCode("<Код товара>")
+                 .setName("<Наименование товара>")
+                 .setUnit("<Единица измерения>")
+                 .setVatMode("<Тип НДС>")
+                 .setPrice(<Цена за единицу>)
+                 .setQuantity(<Количество единиц>)
+                 .setSum(<Цена>)
+                 .setVatAmount(<Размер НДС>)
+                 .build();
+
+         ArrayList<InvoiceItem> list = new ArrayList();
+         list.add(item1);
+         list.add(item2);
+
+         data.setItems(list);
+
+         request.setInvoiceData(data);
+
 Полноценная демонстрация работы библиотеки: https://github.com/RFIBANK/alba-client-android-example
 
