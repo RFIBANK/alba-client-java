@@ -23,6 +23,7 @@ public class InitPaymentRequest {
     private InitTestType test;
     private String cardToken;
     private RecurrentParams recurrentParams;
+    private InvoiceData invoiceData;
 
     public InitPaymentRequest() {
 
@@ -140,10 +141,18 @@ public class InitPaymentRequest {
         this.comment = comment;
     }
 
+    public InvoiceData getInvoiceData() {
+        return invoiceData;
+    }
+
+    public void setInvoiceData(InvoiceData invoiceData) {
+        this.invoiceData = invoiceData;
+    }
+
     public InitPaymentRequest(String paymentType, String key, String secret, BigDecimal cost,
                               String name, String email, String phone, String orderId, String comment,
                               CommissionMode commissionMode, InitTestType test, String cardToken,
-                              RecurrentParams recurrentParams) {
+                              RecurrentParams recurrentParams, InvoiceData invoiceData) {
         this.paymentType = paymentType;
         this.key = key;
         this.secret = secret;
@@ -157,6 +166,7 @@ public class InitPaymentRequest {
         this.test = test;
         this.cardToken = cardToken;
         this.recurrentParams = recurrentParams;
+        this.invoiceData = invoiceData;
     }
 
     public static InitPaymentRequestBuilder builder() {
@@ -213,6 +223,10 @@ public class InitPaymentRequest {
             }
         }
 
+        if (invoiceData != null) {
+            params.put("invoice_data", invoiceData.getParams().toString());
+        }
+
         params.put("test", test.toString());
 
         return params;
@@ -231,7 +245,9 @@ public class InitPaymentRequest {
         private CommissionMode commissionMode;
         private InitTestType test;
         private String cardToken;
+        private boolean background;
         private RecurrentParams recurrentParams;
+        private InvoiceData invoiceData;
 
         public InitPaymentRequestBuilder() {
             test = InitTestType.NONE;
@@ -282,30 +298,14 @@ public class InitPaymentRequest {
             return this;
         }
 
-        public CommissionMode getCommissionMode() {
-            return commissionMode;
-        }
-
         public InitPaymentRequestBuilder setCommissionMode(CommissionMode commissionMode) {
             this.commissionMode = commissionMode;
             return this;
         }
 
-        public InitTestType isTest() {
-            return test;
-        }
-
         public InitPaymentRequestBuilder setTest(InitTestType test) {
             this.test = test;
             return this;
-        }
-
-        public String getCardToken() {
-            return cardToken;
-        }
-
-        public RecurrentParams getRecurrentParams() {
-            return recurrentParams;
         }
 
         public InitPaymentRequestBuilder setRecurrentParams(RecurrentParams recurrentParams) {
@@ -316,6 +316,36 @@ public class InitPaymentRequest {
         public InitPaymentRequestBuilder setCardToken(String cardToken) {
             this.cardToken = cardToken;
             return this;
+        }
+
+        public InitPaymentRequestBuilder setInvoiceData(InvoiceData invoiceData) {
+            this.invoiceData = invoiceData;
+            return this;
+        }
+
+        public InitPaymentRequestBuilder setBackground(boolean background) {
+            this.background = background;
+            return this;
+        }
+
+        public CommissionMode getCommissionMode() {
+            return commissionMode;
+        }
+
+        public InitTestType isTest() {
+            return test;
+        }
+
+        public String getCardToken() {
+            return cardToken;
+        }
+
+        public RecurrentParams getRecurrentParams() {
+            return recurrentParams;
+        }
+
+        public InvoiceData getInvoiceData() {
+            return invoiceData;
         }
 
         public InitPaymentRequest build() {
@@ -332,7 +362,8 @@ public class InitPaymentRequest {
                     commissionMode,
                     test,
                     cardToken,
-                    recurrentParams
+                    recurrentParams,
+                    invoiceData
             );
         }
     }
