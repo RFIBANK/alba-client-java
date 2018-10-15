@@ -1,5 +1,6 @@
 package ru.rficb.alba;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.math.BigDecimal;
@@ -12,6 +13,12 @@ public class InvoiceData {
     private BigDecimal vatTotal;
     private BigDecimal discountTotal;
     private List<InvoiceItem> items;
+
+    public InvoiceData(BigDecimal vatTotal, BigDecimal discountTotal, List<InvoiceItem> items) {
+        this.vatTotal = vatTotal;
+        this.discountTotal = discountTotal;
+        this.items = items;
+    }
 
     public void setVatTotal(BigDecimal vatTotal) {
         this.vatTotal = vatTotal;
@@ -58,6 +65,39 @@ public class InvoiceData {
         params.put("items", invoiceItems);
 
         return new JSONObject(params);
+    }
+
+    public static InvoiceDataBuilder builder() { return new InvoiceDataBuilder(); }
+
+    public final static class InvoiceDataBuilder {
+        private BigDecimal vatTotal;
+        private BigDecimal discountTotal;
+        private List<InvoiceItem> items;
+
+        public InvoiceDataBuilder() {}
+
+        public InvoiceDataBuilder setVatTotal(BigDecimal vatTotal) {
+            this.vatTotal = vatTotal;
+            return this;
+        }
+
+        public InvoiceDataBuilder setDiscountTota(BigDecimal discountTotal) {
+            this.discountTotal = discountTotal;
+            return this;
+        }
+
+        public InvoiceDataBuilder setItems(List<InvoiceItem> items) {
+            this.items = items;
+            return this;
+        }
+
+        public InvoiceData build() {
+            return new InvoiceData(
+                    vatTotal,
+                    discountTotal,
+                    items
+            );
+        }
     }
 }
 
