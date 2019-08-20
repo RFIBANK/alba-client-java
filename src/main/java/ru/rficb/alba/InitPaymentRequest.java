@@ -24,11 +24,12 @@ public class InitPaymentRequest {
     private String cardToken;
     private RecurrentParams recurrentParams;
     private InvoiceData invoiceData;
+    private ExtendedSet extendedSet;
 
     public InitPaymentRequest() {
 
     }
-
+    
     public String getPaymentType() {
         return paymentType;
     }
@@ -93,12 +94,14 @@ public class InitPaymentRequest {
         this.orderId = orderId;
     }
 
-    public boolean isBackground() {
-        return background;
-    }
+    
 
     public void setBackground(boolean background) {
         this.background = background;
+    }
+    
+    public boolean isBackground() {
+        return background;
     }
 
     public CommissionMode getCommissionMode() {
@@ -108,11 +111,11 @@ public class InitPaymentRequest {
     public void setCommissionMode(CommissionMode commissionMode) {
         this.commissionMode = commissionMode;
     }
-
+    
     public InitTestType isTest() {
         return test;
     }
-
+    
     public void setTest(InitTestType test) {
         this.test = test;
     }
@@ -148,11 +151,19 @@ public class InitPaymentRequest {
     public void setInvoiceData(InvoiceData invoiceData) {
         this.invoiceData = invoiceData;
     }
+    
+    public ExtendedSet getExtendedSet() {
+    	return extendedSet;
+    }
+    
+    public void setExtendedSet(ExtendedSet extendedSet) {
+    	this.extendedSet = extendedSet;
+    }
 
     public InitPaymentRequest(String paymentType, String key, String secret, BigDecimal cost,
                               String name, String email, String phone, String orderId, String comment,
                               CommissionMode commissionMode, InitTestType test, String cardToken,
-                              RecurrentParams recurrentParams, InvoiceData invoiceData) {
+                              RecurrentParams recurrentParams, InvoiceData invoiceData, ExtendedSet extendedSet) {
         this.paymentType = paymentType;
         this.key = key;
         this.secret = secret;
@@ -167,6 +178,7 @@ public class InitPaymentRequest {
         this.cardToken = cardToken;
         this.recurrentParams = recurrentParams;
         this.invoiceData = invoiceData;
+        this.extendedSet = extendedSet;
     }
 
     public static InitPaymentRequestBuilder builder() {
@@ -176,8 +188,11 @@ public class InitPaymentRequest {
     public Map<String, String> getParams() throws AlbaFatalError {
 
         Map<String, String> params = new HashMap<>();
-
-        params.put("payment_type", paymentType);
+        
+        if (paymentType != null) {
+            params.put("payment_type", paymentType);
+        }
+        
         params.put("version", "2.1");
         if (key != null) {
             params.put("key", key);
@@ -226,6 +241,31 @@ public class InitPaymentRequest {
         if (invoiceData != null) {
             params.put("invoice_data", invoiceData.getParams().toString());
         }
+        
+        if (extendedSet != null) {
+        	if (extendedSet.getTransferType().equals("bank")) {
+        		params.put("transfer_type", "bank");
+        		params.put("payer_name", extendedSet.getPayerName());
+        		params.put("recipient_name", extendedSet.getRecipientName());
+        		params.put("recipient_inn", extendedSet.getRecipientInn());
+        		params.put("recipient_account", extendedSet.getRecipientAccount());
+        		params.put("recipient_bank_name", extendedSet.getRecipientBankName());
+        		params.put("recipient_bank_id", extendedSet.getRecipientBankId());
+        		params.put("recipient_bank_correspondent_account", extendedSet.getRecipientBankCorrespondentAccount());
+        	} else {
+        		params.put("101_payer_type", extendedSet.getPayerType101());
+        		params.put("103_kpp", extendedSet.getKpp103());
+        		params.put("104_kbk", extendedSet.getKbk104());
+        		params.put("105_okato", extendedSet.getOkato105());
+        		params.put("106_payment_reason", extendedSet.getPaymentReason106());
+        		params.put("107_tax_period", extendedSet.getTaxPeriod107());
+        		params.put("108_tax_doc_num", extendedSet.getTaxDocNum108());
+        		params.put("109_tax_doc_date", extendedSet.getTaxDocDate109());
+        		params.put("110_payment_type", extendedSet.getPaymentType110());
+        		params.put("22_kod", extendedSet.getKod22());
+        		params.put("emp_system_id", extendedSet.getEmpSystemId());
+        		}
+        }
 
         params.put("test", test.toString());
 
@@ -248,6 +288,7 @@ public class InitPaymentRequest {
         private boolean background;
         private RecurrentParams recurrentParams;
         private InvoiceData invoiceData;
+        private ExtendedSet extendedSet;
 
         public InitPaymentRequestBuilder() {
             test = InitTestType.NONE;
@@ -327,13 +368,14 @@ public class InitPaymentRequest {
             this.background = background;
             return this;
         }
+        
+        public InitPaymentRequestBuilder setExtendedSet (ExtendedSet extendedSet) {
+        	this.extendedSet = extendedSet;
+        	return this;
+        }
 
         public CommissionMode getCommissionMode() {
             return commissionMode;
-        }
-
-        public InitTestType isTest() {
-            return test;
         }
 
         public String getCardToken() {
@@ -346,6 +388,14 @@ public class InitPaymentRequest {
 
         public InvoiceData getInvoiceData() {
             return invoiceData;
+        }
+        
+        public ExtendedSet getExtendedSet() {
+        	return extendedSet;
+        }
+        
+        public InitTestType isTest() {
+            return test;
         }
 
         public InitPaymentRequest build() {
@@ -363,7 +413,8 @@ public class InitPaymentRequest {
                     test,
                     cardToken,
                     recurrentParams,
-                    invoiceData
+                    invoiceData,
+                    extendedSet
             );
         }
     }
