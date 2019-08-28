@@ -147,7 +147,7 @@ public class InitPaymentRequest {
     public InvoiceData getInvoiceData() {
         return invoiceData;
     }
-
+ 
     public void setInvoiceData(InvoiceData invoiceData) {
         this.invoiceData = invoiceData;
     }
