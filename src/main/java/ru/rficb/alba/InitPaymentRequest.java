@@ -6,14 +6,12 @@ import java.util.Map;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 /**
  * Параметры запроса ни инициацию платежа
  */
 @Builder()
 @Getter
-//@Setter
 public class InitPaymentRequest {
 
     private String paymentType;
