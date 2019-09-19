@@ -6,10 +6,9 @@ package ru.rficb.alba;
 public enum InitTestType {
     NONE("0"),
     OK("ok"),
-    OPERATOR_CANCEL("operator_cancel"),
-    ;
+    OPERATOR_CANCEL("operator_cancel");
+	
     private final String text;
-
 
     InitTestType(final String text) {
         this.text = text;
