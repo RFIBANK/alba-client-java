@@ -11,9 +11,9 @@ import lombok.Setter;
 /**
  * Параметры запроса ни инициацию платежа
  */
-@Builder
+@Builder()
 @Getter
-@Setter
+//@Setter
 public class InitPaymentRequest {
 
     private String paymentType;
