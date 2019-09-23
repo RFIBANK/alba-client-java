@@ -19,6 +19,8 @@ CardTokenRequest - параметры запроса на получение т�
 
 CardTokenResponse - результат создания токена.
 
+TransferTypeBank/TransferTypeBankGov - наборы дополнительных параметров для проведения платежей по реквизитам (https://lib.rfibank.ru/pages/viewpage.action?pageId=885366). Включает в себя два основных набора Bank() И BankGov()
+
 В процессе работы могут сработать два исключения: AlbaTemporaryError и AlbaFatalError.
 AlbaTemporaryError - срабатывает, если случиласть временная ошибка.
 AlbaFatalError - срабатывает, если ошибка фатальна и не имеет смысла пытаться повторять операцию.
@@ -29,11 +31,11 @@ AlbaFatalError - срабатывает, если ошибка фатальна 
        AlbaService service = new AlbaService("<KEY>");
        InitPaymentRequest request = new InitPaymentRequest()
                 .builder()
-                .setPaymentType("mc")
-                .setCost(new BigDecimal(10.5))
-                .setName("Test")
-                .setEmail("main@example.com")
-                .setPhone("71111111111")
+                .paymentType("mc")
+                .cost(new BigDecimal(10.5))
+                .name("Test")
+                .email("main@example.com")
+                .phone("71111111111")
                 .build();
        InitPaymentResponse response = service.initPayment(request);
 
@@ -62,14 +64,13 @@ AlbaFatalError - срабатывает, если ошибка фатальна 
 детализацию ошибок можно найти в response.errors
 или вызывая методы getCardErrors, getCardHolderErrors, getExMonthErrors, getExpYearErrors и getCvcErrors.
 
-
 Инициация транзакции с использованием токена:
 
        InitPaymentRequest request = InitPaymentRequest.builder()
-                    .setPaymentType("spg_test")
-                    .setCost(new BigDecimal(10.5))
-                    .setName("Test")
-                    .setCardToken(response.getToken())
+                    .paymentType("spg_test")
+                    .cost(new BigDecimal(10.5))
+                    .name("Test")
+                    .cardToken(response.getToken())
                     .build();
        InitPaymentResponse response = alba.initPayment(request);
 
@@ -117,6 +118,32 @@ AlbaFatalError - срабатывает, если ошибка фатальна 
 
 Тогда пользователь будет направлен через форму банка, на URL страницы успешной покупки/ошибки сервиса.
 
+Оплата по реквизитам
+-------------
+
+Подробная документация - https://lib.rfibank.ru/pages/viewpage.action?pageId=885366
+Содержит два набора параметров:
+
+TransferTypeBank - "transfer_type" = "bank";
+TransferTypeBankGov - "transfer_type" = "bank_gov";
+
+Создание набора параметров для осуществления платежей по реквизитам:
+ 
+       TransferTypeBank payWith = TransferTypeBank.builder()
+				.payerName("Ivan Ivanovich")
+				.recipientName("Petr Petrovich")
+				.recipientInn("01234567890")
+				.recipientAccount("40817810099910004312")
+				.recipientBankName("RFI Bank")
+				.recipientBankId("044525799")
+				.recipientBankCorrespondentAccount("30101810045250000799")
+				.build();
+       InitPaymentRequest request = InitPaymentRequest.builder()
+                     .transferTypeBank(payWith)
+                     .build();
+                     
+
+
 Рекуррентный платеж
 -------------
 
@@ -130,9 +157,9 @@ AlbaFatalError - срабатывает, если ошибка фатальна 
          InitPaymentRequest request = InitPaymentRequest
                 .builder()
                 ...
-                .setRecurrentParams(RecurrentParams.first("<URL>", "<COMMENT>"))
-                .setCardToken(response.getToken())
-                .setOrderId("1000")
+                .recurrentParams(RecurrentParams.first("<URL>", "<COMMENT>"))
+                .cardToken(response.getToken())
+                .orderId("1000")
                 ...
 
 Последующие вызовы должны содержать orderId, который был использован при первом вызове.
@@ -142,7 +169,7 @@ AlbaFatalError - срабатывает, если ошибка фатальна 
          InitPaymentRequest request = InitPaymentRequest
                 .builder()
                 ...
-                .setRecurrentParams(RecurrentParams.next("1000"))
+                .recurrentParams(RecurrentParams.next("1000"))
                 ...
 
 Если нужно добавить данные чека для фискализации, то необходимо создать объект InvoiceData и передать его в параметре paymentRequest:

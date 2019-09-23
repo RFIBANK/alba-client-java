@@ -4,11 +4,22 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
+import lombok.Builder;
+import lombok.Getter;
+
 /**
  * Параметры запроса ни инициацию платежа
  */
+@Builder()
+@Getter
 public class InitPaymentRequest {
 
+	@Builder.Default
+    private boolean background = true;
+    
+    @Builder.Default
+    private InitTestType test = InitTestType.NONE;
+    
     private String paymentType;
     private String key;
     private String secret;
@@ -18,166 +29,21 @@ public class InitPaymentRequest {
     private String phone;
     private String orderId;
     private String comment;
-    private CommissionMode commissionMode;
-    private boolean background = true;
-    private InitTestType test;
+    private CommissionMode commissionMode;    
     private String cardToken;
     private RecurrentParams recurrentParams;
     private InvoiceData invoiceData;
-
-    public InitPaymentRequest() {
-
-    }
-
-    public String getPaymentType() {
-        return paymentType;
-    }
-
-    public void setPaymentType(String paymentType) {
-        this.paymentType = paymentType;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getSecret() {
-        return secret;
-    }
-
-    public void setSecret(String secret) {
-        this.secret = secret;
-    }
-
-    public BigDecimal getCost() {
-        return cost;
-    }
-
-    public void setCost(BigDecimal cost) {
-        this.cost = cost;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(String orderId) {
-        this.orderId = orderId;
-    }
-
-    public boolean isBackground() {
-        return background;
-    }
-
-    public void setBackground(boolean background) {
-        this.background = background;
-    }
-
-    public CommissionMode getCommissionMode() {
-        return commissionMode;
-    }
-
-    public void setCommissionMode(CommissionMode commissionMode) {
-        this.commissionMode = commissionMode;
-    }
-
-    public InitTestType isTest() {
-        return test;
-    }
-
-    public void setTest(InitTestType test) {
-        this.test = test;
-    }
-
-    public String getCardToken() {
-        return cardToken;
-    }
-
-    public void setCardToken(String cardToken) {
-        this.cardToken = cardToken;
-    }
-
-    public RecurrentParams getRecurrentParams() {
-        return recurrentParams;
-    }
-
-    public void setRecurrentParams(RecurrentParams recurrentParams) {
-        this.recurrentParams = recurrentParams;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
-    public InvoiceData getInvoiceData() {
-        return invoiceData;
-    }
-
-    public void setInvoiceData(InvoiceData invoiceData) {
-        this.invoiceData = invoiceData;
-    }
-
-    public InitPaymentRequest(String paymentType, String key, String secret, BigDecimal cost,
-                              String name, String email, String phone, String orderId, String comment,
-                              CommissionMode commissionMode, InitTestType test, String cardToken,
-                              RecurrentParams recurrentParams, InvoiceData invoiceData) {
-        this.paymentType = paymentType;
-        this.key = key;
-        this.secret = secret;
-        this.cost = cost;
-        this.name = name;
-        this.email = email;
-        this.phone = phone;
-        this.orderId = orderId;
-        this.comment = comment;
-        this.commissionMode = commissionMode;
-        this.test = test;
-        this.cardToken = cardToken;
-        this.recurrentParams = recurrentParams;
-        this.invoiceData = invoiceData;
-    }
-
-    public static InitPaymentRequestBuilder builder() {
-        return new InitPaymentRequestBuilder();
-    }
+    private TransferTypeBank transferTypeBank;
+    private TransferTypeBankGov transferTypeBankGov;
 
     public Map<String, String> getParams() throws AlbaFatalError {
 
         Map<String, String> params = new HashMap<>();
-
-        params.put("payment_type", paymentType);
+        
+        if (paymentType != null) {
+            params.put("payment_type", paymentType);
+        }
+        
         params.put("version", "2.1");
         if (key != null) {
             params.put("key", key);
@@ -226,146 +92,36 @@ public class InitPaymentRequest {
         if (invoiceData != null) {
             params.put("invoice_data", invoiceData.getParams().toString());
         }
-
+        
+        if (transferTypeBank != null) {
+        	params.put("transfer_type", transferTypeBank.getTransferType().toString());
+    		params.put("payer_name", transferTypeBank.getPayerName());
+    		params.put("recipient_name", transferTypeBank.getRecipientName());
+    		params.put("recipient_inn", transferTypeBank.getRecipientInn());
+    		params.put("recipient_account", transferTypeBank.getRecipientAccount());
+    		params.put("recipient_bank_name", transferTypeBank.getRecipientBankName());
+    		params.put("recipient_bank_id", transferTypeBank.getRecipientBankId());
+    		params.put("recipient_bank_correspondent_account", transferTypeBank.getRecipientBankCorrespondentAccount());
+        }
+        
+        if (transferTypeBankGov != null) {
+        	params.put("transfer_type", transferTypeBankGov.getTransferType().toString());
+        	params.put("101_payer_type", transferTypeBankGov.getPayerType101());
+        	params.put("103_kpp", transferTypeBankGov.getKpp103());
+        	params.put("104_kbk", transferTypeBankGov.getKbk104());
+        	params.put("105_okato", transferTypeBankGov.getOkato105());
+        	params.put("106_payment_reason", transferTypeBankGov.getPaymentReason106());
+        	params.put("107_tax_period", transferTypeBankGov.getTaxPeriod107());
+        	params.put("108_tax_doc_num", transferTypeBankGov.getTaxDocNum108());
+        	params.put("109_tax_doc_date", transferTypeBankGov.getTaxDocDate109());
+        	params.put("110_payment_type", transferTypeBankGov.getPaymentType110());
+        	params.put("22_kod", transferTypeBankGov.getKod22());
+        	params.put("emp_system_id", transferTypeBankGov.getEmpSystemId());
+        	
+        }
+        
         params.put("test", test.toString());
-
         return params;
-    }
-
-    public static final class InitPaymentRequestBuilder {
-        private String paymentType;
-        private String key;
-        private String secret;
-        private BigDecimal cost;
-        private String name;
-        private String email;
-        private String phone;
-        private String orderId;
-        private String comment;
-        private CommissionMode commissionMode;
-        private InitTestType test;
-        private String cardToken;
-        private boolean background;
-        private RecurrentParams recurrentParams;
-        private InvoiceData invoiceData;
-
-        public InitPaymentRequestBuilder() {
-            test = InitTestType.NONE;
-        }
-
-        public InitPaymentRequestBuilder setPaymentType(String paymentType) {
-            this.paymentType = paymentType;
-            return this;
-        }
-
-        public InitPaymentRequestBuilder setKey(String key) {
-            this.key = key;
-            return this;
-        }
-
-        public InitPaymentRequestBuilder setCost(BigDecimal cost) {
-            this.cost = cost;
-            return this;
-        }
-
-        public InitPaymentRequestBuilder setName(String name) {
-            this.name = name;
-            return this;
-        }
-
-        public InitPaymentRequestBuilder setEmail(String email) {
-            this.email = email;
-            return this;
-        }
-
-        public InitPaymentRequestBuilder setPhone(String phone) {
-            this.phone = phone;
-            return this;
-        }
-
-        public InitPaymentRequestBuilder setOrderId(String orderId) {
-            this.orderId = orderId;
-            return this;
-        }
-
-        public InitPaymentRequestBuilder setComment(String comment) {
-            this.comment = comment;
-            return this;
-        }
-
-        public InitPaymentRequestBuilder setSecret(String secret) {
-            this.secret = secret;
-            return this;
-        }
-
-        public InitPaymentRequestBuilder setCommissionMode(CommissionMode commissionMode) {
-            this.commissionMode = commissionMode;
-            return this;
-        }
-
-        public InitPaymentRequestBuilder setTest(InitTestType test) {
-            this.test = test;
-            return this;
-        }
-
-        public InitPaymentRequestBuilder setRecurrentParams(RecurrentParams recurrentParams) {
-            this.recurrentParams = recurrentParams;
-            return this;
-        }
-
-        public InitPaymentRequestBuilder setCardToken(String cardToken) {
-            this.cardToken = cardToken;
-            return this;
-        }
-
-        public InitPaymentRequestBuilder setInvoiceData(InvoiceData invoiceData) {
-            this.invoiceData = invoiceData;
-            return this;
-        }
-
-        public InitPaymentRequestBuilder setBackground(boolean background) {
-            this.background = background;
-            return this;
-        }
-
-        public CommissionMode getCommissionMode() {
-            return commissionMode;
-        }
-
-        public InitTestType isTest() {
-            return test;
-        }
-
-        public String getCardToken() {
-            return cardToken;
-        }
-
-        public RecurrentParams getRecurrentParams() {
-            return recurrentParams;
-        }
-
-        public InvoiceData getInvoiceData() {
-            return invoiceData;
-        }
-
-        public InitPaymentRequest build() {
-            return new InitPaymentRequest(
-                    paymentType,
-                    key,
-                    secret,
-                    cost,
-                    name,
-                    email,
-                    phone,
-                    orderId,
-                    comment,
-                    commissionMode,
-                    test,
-                    cardToken,
-                    recurrentParams,
-                    invoiceData
-            );
-        }
     }
 
 }
