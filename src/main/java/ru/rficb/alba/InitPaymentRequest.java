@@ -14,6 +14,12 @@ import lombok.Getter;
 @Getter
 public class InitPaymentRequest {
 
+	@Builder.Default
+    private boolean background = true;
+    
+    @Builder.Default
+    private InitTestType test = InitTestType.NONE;
+    
     private String paymentType;
     private String key;
     private String secret;
@@ -23,14 +29,7 @@ public class InitPaymentRequest {
     private String phone;
     private String orderId;
     private String comment;
-    private CommissionMode commissionMode;
-    
-    @Builder.Default
-    private boolean background = true;
-    
-    @Builder.Default
-    private InitTestType test = InitTestType.NONE;
-    
+    private CommissionMode commissionMode;    
     private String cardToken;
     private RecurrentParams recurrentParams;
     private InvoiceData invoiceData;
