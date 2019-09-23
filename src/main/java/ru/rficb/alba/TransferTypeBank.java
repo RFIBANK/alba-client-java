@@ -3,7 +3,6 @@ package ru.rficb.alba;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.experimental.NonFinal;
 
 @Builder
 @Getter

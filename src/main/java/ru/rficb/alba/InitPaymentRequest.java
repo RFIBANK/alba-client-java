@@ -24,8 +24,13 @@ public class InitPaymentRequest {
     private String orderId;
     private String comment;
     private CommissionMode commissionMode;
-    @Builder.Default private boolean background = true;
-    @Builder.Default private InitTestType test = InitTestType.NONE;
+    
+    @Builder.Default
+    private boolean background = true;
+    
+    @Builder.Default
+    private InitTestType test = InitTestType.NONE;
+    
     private String cardToken;
     private RecurrentParams recurrentParams;
     private InvoiceData invoiceData;
